@@ -171,6 +171,12 @@
                     addSubtask(subtasksDiv, progressBarFill, todoItem);
                 });
 
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Delete";                
+                deleteButton.addEventListener('click', () => {
+                   todoList.removeChild(todoItem);
+                });
+
                 todoItem.appendChild(checkbox);
                 todoItem.appendChild(label);
                 todoItem.appendChild(dueDateDisplay);
@@ -178,6 +184,7 @@
                 todoItem.appendChild(progressBar);
                 todoItem.appendChild(addSubtaskButton);
                 todoItem.appendChild(subtasksDiv);
+                todoItem.appendChild(deleteButton);
                 todoList.appendChild(todoItem);
 
                 newTaskInput.value = '';
@@ -214,7 +221,12 @@
                     subtaskDiv.appendChild(subtaskInput);
                     subtaskDiv.appendChild(subtaskDueDate);
                     subtaskDiv.appendChild(subtaskDueTime);
-        
+
+                    const deleteSubtaskButton = document.createElement('button');
+                    deleteSubtaskButton.textContent = "Delete";
+                    deleteSubtaskButton.addEventListener('click', () => {
+                        subtasksDiv.removeChild(subtaskDiv);
+                    });
                     subtasksDiv.appendChild(subtaskDiv);
         
                     subtaskCheckbox.addEventListener('change', () => {
