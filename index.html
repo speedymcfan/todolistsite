@@ -18,7 +18,7 @@
             width: 500px;
             margin: 20px auto;
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 0.5fr; /* Adjusted for due date and time */
+            grid-template-columns: 2fr 1fr 1fr 0.5fr;
             gap: 10px;
         }
 
@@ -44,7 +44,7 @@
 
         .todo-item {
             display: grid;
-            grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr; /* Adjusted for due date and time */
+            grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
             align-items: center;
             padding: 5px;
             border-bottom: 1px solid #eee;
@@ -62,6 +62,7 @@
             text-decoration: line-through;
             color: #888;
         }
+
         .progress-bar {
             width: 80%;
             height: 10px;
@@ -76,7 +77,6 @@
             width: 0%;
             transition: width 0.3s ease;
         }
-
     </style>
 </head>
 <body>
@@ -98,6 +98,26 @@
         const dueTimeInput = document.getElementById('due-time');
         const addTaskButton = document.getElementById('add-task');
         const todoList = document.getElementById('todo-list');
+
+        function setMinDateAndTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+
+            dueDateInput.setAttribute('min', `${year}-${month}-${day}`);
+            if (dueDateInput.value === `${year}-${month}-${day}`) {
+                dueTimeInput.setAttribute('min', `${hours}:${minutes}`);
+            } else {
+                dueTimeInput.removeAttribute('min');
+            }
+        }
+
+        dueDateInput.addEventListener('change', setMinDateAndTime);
+
+        setMinDateAndTime(); // Set initial min values
 
         addTaskButton.addEventListener('click', () => {
             const taskText = newTaskInput.value.trim();
@@ -148,6 +168,7 @@
                         progressBarFill.style.width = '0%';
                     }
                 });
+                setMinDateAndTime();
             }
         });
 
@@ -158,6 +179,9 @@
           }
         });
 
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
