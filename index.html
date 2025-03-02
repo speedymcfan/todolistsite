@@ -67,6 +67,16 @@
             color: #888;
         }
 
+        .subtasks {
+            margin-left: 20px;
+        }
+
+        .subtask{
+            display: grid;
+            grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
+            align-items: center;
+        }
+
         .progress-bar {
             width: 80%;
             height: 10px;
@@ -152,11 +162,22 @@
                 progressBarFill.classList.add('progress-bar-fill');
                 progressBar.appendChild(progressBarFill);
 
+                const subtasksDiv = document.createElement('div');
+                subtasksDiv.classList.add('subtasks');
+
+                const addSubtaskButton = document.createElement('button');
+                addSubtaskButton.textContent = "Add Subtask";
+                addSubtaskButton.addEventListener('click', () => {
+                    addSubtask(subtasksDiv, progressBarFill, todoItem);
+                });
+
                 todoItem.appendChild(checkbox);
                 todoItem.appendChild(label);
                 todoItem.appendChild(dueDateDisplay);
                 todoItem.appendChild(dueTimeDisplay);
                 todoItem.appendChild(progressBar);
+                todoItem.appendChild(addSubtaskButton);
+                todoItem.appendChild(subtasksDiv);
                 todoList.appendChild(todoItem);
 
                 newTaskInput.value = '';
@@ -172,6 +193,50 @@
                         progressBarFill.style.width = '0%';
                     }
                 });
+
+                function addSubtask(subtasksDiv, progressBarFill, todoItem) {
+                    const subtaskDiv = document.createElement('div');
+                    subtaskDiv.classList.add('subtask');
+
+                    const subtaskCheckbox = document.createElement('input');
+                    subtaskCheckbox.type = 'checkbox';
+        
+                    const subtaskInput = document.createElement('input');
+                    subtaskInput.type = 'text';
+                    subtaskInput.placeholder = "Subtask Description";
+        
+                    const subtaskDueDate = document.createElement('input');
+                    subtaskDueDate.type = 'date';
+                    const subtaskDueTime = document.createElement('input');
+                    subtaskDueTime.type = 'time';
+        
+                    subtaskDiv.appendChild(subtaskCheckbox);
+                    subtaskDiv.appendChild(subtaskInput);
+                    subtaskDiv.appendChild(subtaskDueDate);
+                    subtaskDiv.appendChild(subtaskDueTime);
+        
+                    subtasksDiv.appendChild(subtaskDiv);
+        
+                    subtaskCheckbox.addEventListener('change', () => {
+                        updateMainTaskCompletion(todoItem);
+                    });
+                }
+        
+                function updateMainTaskCompletion(todoItem) {
+                    const checkboxes = todoItem.querySelectorAll('input[type="checkbox"]');
+                    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+                    const totalCount = checkboxes.length;
+                    const progressBarFill = todoItem.querySelector('.progress-bar-fill');
+                    progressBarFill.style.width = `${(checkedCount / totalCount) * 100}%`;
+                    const mainCheckbox = todoItem.querySelector('input[type="checkbox"]');
+                    if (checkedCount === totalCount && totalCount > 0){
+                        mainCheckbox.checked = true;
+                        todoItem.classList.add('completed');
+                    } else {
+                        mainCheckbox.checked = false;
+                        todoItem.classList.remove('completed');
+                    }
+                }
                 setMinDateAndTime();
 
             }
