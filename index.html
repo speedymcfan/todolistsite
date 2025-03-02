@@ -137,10 +137,10 @@
                 label.setAttribute('for', checkbox.id);
 
                 const dueDateDisplay = document.createElement('span');
-                dueDateDisplay.textContent = dueDate || "No Due Date";
+                dueDateDisplay.textContent = dueDate || "--";
 
                 const dueTimeDisplay = document.createElement('span');
-                dueTimeDisplay.textContent = dueTime || "No Due Time";
+                dueTimeDisplay.textContent = dueTime || "--";
 
                 const progressBar = document.createElement('div');
                 progressBar.classList.add('progress-bar');
