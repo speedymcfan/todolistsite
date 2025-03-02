@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple To-Do List</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #todo-list {
+            width: 500px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+
+        .todo-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .todo-item.completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>My To-Do List</h1>
+
+    <div id="todo-list">
+        <div class="todo-item">
+            <input type="checkbox" id="task1">
+            <label for="task1">Buy groceries</label>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox" id="task2">
+            <label for="task2">Finish coding project</label>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox" id="task3">
+            <label for="task3">Call the doctor</label>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox" id="task4">
+            <label for="task4">Read a chapter of a book</label>
+        </div>
+        <div class="todo-item">
+            <input type="checkbox" id="task5">
+            <label for="task5">Walk the dog</label>
+        </div>
+    </div>
+
+    <script>
+        const checkboxes = document.querySelectorAll('#todo-list input[type="checkbox"]');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    this.parentElement.classList.add('completed');
+                } else {
+                    this.parentElement.classList.remove('completed');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
