@@ -3,14 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic To-Do List with Due Dates</title>
+    <title>To-Do List</title>
     <style>
         body {
-            font-family: sans-serif;
+            background-color: #bbb4d4;
+            font: Bookman;
             margin: 20px;
         }
 
         h1 {
+            margin-top: 50px;
+            padding-top: 20px;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            background-color:rgb(134, 61, 165);
+            color: white;
             text-align: center;
         }
         #add-task:disabled{
@@ -33,7 +40,14 @@
 
         #todo-input button {
             padding: 8px 15px;
-            background-color: #007bff;
+            background-color: rgb(134, 61, 165);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .todo-item button{
+            padding: 8px 15px;
+            background-color: rgb(134, 61, 165);
             color: white;
             border: none;
             cursor: pointer;
@@ -47,11 +61,19 @@
         }
 
         .todo-item {
-            display: grid;
-            grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
-            align-items: center;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
             padding: 5px;
             border-bottom: 1px solid #eee;
+        }
+
+        .todo-item button {
+            margin: 10px;
+        }
+
+        .todo-item label {
+            font-weight: bold;
         }
 
         .todo-item:last-child {
@@ -63,8 +85,12 @@
         }
 
         .todo-item.completed {
-            text-decoration: line-through;
             color: #888;
+        }
+
+        .todo-item.completed button {
+            color: white;
+            cursor: pointer;
         }
 
         .subtasks {
@@ -72,8 +98,7 @@
         }
 
         .subtask{
-            display: grid;
-            grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
+            display: flex;
             align-items: center;
         }
 
@@ -90,6 +115,17 @@
             background-color: #4caf50;
             width: 0%;
             transition: width 0.3s ease;
+        }
+
+        .button-container {
+            display: flex; 
+            justify-content: flex-start; 
+            margin-bottom: 5px; 
+        }
+
+        .todo-item > div:not(.subtasks):not(.button-container) {
+            display: flex;
+            align-items: center;
         }
     </style>
 </head>
@@ -142,19 +178,27 @@
                 const todoItem = document.createElement('div');
                 todoItem.classList.add('todo-item');
 
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `task-${Date.now()}`;
+                const completeButton = document.createElement('button');
+                completeButton.textContent = "Mark as complete";
+                completeButton.id = 'task-${Date.now()}';
 
                 const label = document.createElement('label');
                 label.textContent = taskText;
-                label.setAttribute('for', checkbox.id);
+                label.setAttribute('for', completeButton.id);
 
                 const dueDateDisplay = document.createElement('span');
-                dueDateDisplay.textContent = dueDate || "No Due Date";
+                const [year, month, day] = dueDate.split('-');
+                dueDateDisplay.textContent = dueDate ? `${month}/${day}/${year}` : "\n";
 
                 const dueTimeDisplay = document.createElement('span');
-                dueTimeDisplay.textContent = dueTime || "No Due Time";
+                if (dueTime) {
+                    let [hours, minutes] = dueTime.split(':');
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12 || 12;
+                    dueTimeDisplay.textContent = `${hours}:${minutes} ${ampm}`;
+                } else {
+                    dueTimeDisplay.textContent = "\n";
+                }
 
                 const progressBar = document.createElement('div');
                 progressBar.classList.add('progress-bar');
@@ -165,6 +209,9 @@
                 const subtasksDiv = document.createElement('div');
                 subtasksDiv.classList.add('subtasks');
 
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container'); 
+
                 const addSubtaskButton = document.createElement('button');
                 addSubtaskButton.textContent = "Add Subtask";
                 addSubtaskButton.addEventListener('click', () => {
@@ -172,50 +219,60 @@
                 });
 
                 const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Delete";                
+                deleteButton.textContent = "Delete";
                 deleteButton.addEventListener('click', () => {
-                   todoList.removeChild(todoItem);
+                    todoList.removeChild(todoItem);
                 });
 
-                todoItem.appendChild(checkbox);
-                todoItem.appendChild(label);
-                todoItem.appendChild(dueDateDisplay);
-                todoItem.appendChild(dueTimeDisplay);
-                todoItem.appendChild(progressBar);
-                todoItem.appendChild(addSubtaskButton);
-                todoItem.appendChild(subtasksDiv);
-                todoItem.appendChild(deleteButton);
-                todoList.appendChild(todoItem);
-
+                buttonContainer.appendChild(completeButton);
+                buttonContainer.appendChild(deleteButton); 
+                
                 newTaskInput.value = '';
                 dueDateInput.value = '';
                 dueTimeInput.value = '';
 
-                checkbox.addEventListener('change', () => {
-                    if (checkbox.checked) {
+                completeButton.addEventListener('click', () => {
+                    if (completeButton.textContent === "Mark as complete"){
+                        completeButton.textcontent = "Mark as incomplete";
                         todoItem.classList.add('completed');
                         progressBarFill.style.width = '100%';
                     } else {
+                        completeButton.textContent = "Mark as complete";
                         todoItem.classList.remove('completed');
                         progressBarFill.style.width = '0%';
+                        const subtaskcheckboxes = todoItem.querySelectorAll('.subtasks input[type="checkbox"]');
+                        subtaskcheckboxes.forEach(checkbox => checkbox.checked = false);
                     }
+                    updateMainTaskCompletion(todoItem, completeButton);
                 });
 
-                function addSubtask(subtasksDiv, progressBarFill, todoItem) {
+                todoItem.appendChild(buttonContainer);
+                todoItem.appendChild(label);
+                todoItem.appendChild(dueDateDisplay);
+                todoItem.appendChild(dueTimeDisplay);
+                todoItem.appendChild(progressBar);
+                todoItem.appendChild(addSubtaskButton); 
+                todoItem.appendChild(subtasksDiv); 
+                todoList.appendChild(todoItem);
+
+                updateMainTaskCompletion(todoItem, completeButton);                
+
+                function addSubtask(subtasksDiv, progressBarFill, todoItem, button) {
                     const subtaskDiv = document.createElement('div');
                     subtaskDiv.classList.add('subtask');
 
                     const subtaskCheckbox = document.createElement('input');
                     subtaskCheckbox.type = 'checkbox';
         
-                    const subtaskInput = document.createElement('input');
-                    subtaskInput.type = 'text';
+                    const subtaskInput = document.createElement('textarea');
                     subtaskInput.placeholder = "Subtask Description";
+                    subtaskInput.rows = 3;
         
                     const subtaskDueDate = document.createElement('input');
                     subtaskDueDate.type = 'date';
                     const subtaskDueTime = document.createElement('input');
                     subtaskDueTime.type = 'time';
+                    
         
                     subtaskDiv.appendChild(subtaskCheckbox);
                     subtaskDiv.appendChild(subtaskInput);
@@ -226,32 +283,40 @@
                     deleteSubtaskButton.textContent = "Delete";
                     deleteSubtaskButton.addEventListener('click', () => {
                         subtasksDiv.removeChild(subtaskDiv);
+                        updateMainTaskCompletion(todoItem, button);
                     });
+                    subtaskDiv.appendChild(deleteSubtaskButton);
                     subtasksDiv.appendChild(subtaskDiv);
         
                     subtaskCheckbox.addEventListener('change', () => {
-                        updateMainTaskCompletion(todoItem);
+                        updateMainTaskCompletion(todoItem, button);
                     });
                 }
         
-                function updateMainTaskCompletion(todoItem) {
-                    const checkboxes = todoItem.querySelectorAll('input[type="checkbox"]');
-                    const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
-                    const totalCount = checkboxes.length;
+                function updateMainTaskCompletion(todoItem, button) {
+                    const subtaskCheckboxes = todoItem.querySelectorAll('.subtask input[type="checkbox"]');
+                    const checkedCount = Array.from(subtaskCheckboxes).filter(cb => cb.checked).length;
+                    const totalCount = subtaskCheckboxes.length;
                     const progressBarFill = todoItem.querySelector('.progress-bar-fill');
                     progressBarFill.style.width = `${(checkedCount / totalCount) * 100}%`;
-                    const mainCheckbox = todoItem.querySelector('input[type="checkbox"]');
-                    if (checkedCount === totalCount && totalCount > 0){
-                        mainCheckbox.checked = true;
-                        todoItem.classList.add('completed');
-                    } else {
-                        mainCheckbox.checked = false;
-                        todoItem.classList.remove('completed');
+                
+                    if (button) {
+                        if (checkedCount === totalCount && totalCount > 0){
+                            button.textContent = "Mark as incomplete";
+                            todoItem.classList.add('completed');
+                            progressBarFill.style.width = '100%';
+                        } else {
+                            button.textContent = "Mark as complete";
+                            todoItem.classList.remove('completed');
+                        }
                     }
+                    
                 }
                 setMinDateAndTime();
 
             }
+
+            addTaskButton.disabled = true;
         });
 
         function checkInput(){
@@ -264,7 +329,7 @@
 
         newTaskInput.addEventListener("input", checkInput);
 
-        checkInput(); //run on load
+        checkInput();
 
 
         newTaskInput.addEventListener("keypress", function(event) {
